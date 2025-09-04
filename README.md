@@ -3,7 +3,6 @@
 A Phoenix app for credit applications: user registration, survey, salary input, PDF summary generation, and email delivery. Built with Elixir, LiveView, pdf_generator, and Swoosh.
 
 ## Features
-- User creation with LiveView.
 - Survey form.
 - Salary calculation and credit limit.
 - PDF generation and email attachment.
