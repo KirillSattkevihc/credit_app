@@ -68,7 +68,8 @@ defmodule CreditApp.MixProject do
       {:bandit, "~> 1.5"},
       {:hackney, "~> 1.9"},
       {:finch, "~> 0.19"},
-      {:pdf_generator, "~> 0.6"}
+      {:pdf_generator, "~> 0.6"},
+      {:ex_machina, "~> 2.7", only: :test}
     ]
   end
 

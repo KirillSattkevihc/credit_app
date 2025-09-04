@@ -6,7 +6,6 @@ defmodule CreditApp.Repo.Migrations.CreateUsers do
       add :name, :string
       add :email, :string
       add :credit_points, :integer, default: 0
-      add :salary, :decimal, default: 0.0
 
       timestamps(type: :utc_datetime)
     end
