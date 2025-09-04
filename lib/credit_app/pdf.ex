@@ -1,25 +1,9 @@
 defmodule CreditApp.PDF do
-  alias CreditApp.Accounts.User
+  alias CreditApp.Models.SalaryRecord
+  alias CreditApp.Models.User
 
-  def generate_pdf_binary(%User{} = user, credit_limit) do
-    html = """
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <title>Credit Summary</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 40px; }
-          h1 { color: #333; }
-          p { font-size: 16px; line-height: 1.5; }
-        </style>
-      </head>
-      <body>
-        <h1>Credit Summary for #{user.name}</h1>
-        <p> Congratulations, you have been approved for credit up to $#{credit_limit || 0.0}</p>
-      </body>
-      </html>
-    """
+  def generate_pdf_binary(%User{} = user, %SalaryRecord{} = salary_record) do
+    html = __MODULE__.Templates.CreditSummary.render(user, salary_record)
 
     {:ok, pdf_binary} =
       PdfGenerator.generate_binary(

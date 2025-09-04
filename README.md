@@ -1,3 +1,13 @@
+# CreditApp
+
+A Phoenix app for credit applications: user registration, survey, salary input, PDF summary generation, and email delivery. Built with Elixir, LiveView, pdf_generator, and Swoosh.
+
+## Features
+- Survey form.
+- Salary calculation and credit limit.
+- PDF generation and email attachment.
+- Flash messages and local email testing.
+
 ### Instructions to Run CreditApp Locally
 
 #### 1. Unpack the Archive
@@ -146,13 +156,19 @@ mix assets.build
 mix compile
 ```
 
+#### 6. Run tests
+Run tests:
+```bash
+mix test
+```
+
 #### 6. Start the Application
 Run the Phoenix server:
 ```bash
 mix phx.server
 ```
 
-#### 7. Access the App
+#### 8. Access the App
 - Open a browser and go to `http://localhost:4000`.
 - Follow these steps:
   1. Visit `/users/new` to create a user (enter name and email).
@@ -162,7 +178,7 @@ mix phx.server
   5. Check for the flash message `"Congratulations, you have been approved..."` on `/`.
   6. Visit `http://localhost:4000/dev/mailbox` to see the emailed PDF.
 
-#### 8. Troubleshooting
+#### 9. Troubleshooting
 - **App Doesn’t Start**:
   - Check prerequisites:
     ```bash
@@ -192,7 +208,7 @@ mix phx.server
   - Visit `http://localhost:4000/dev/mailbox`.
   - Check logs for `Email Debug` output (if added to `lib/credit_app/email.ex`).
 
-#### 9. Notes
+#### 10. Notes
 - **Port Conflicts**: If `http://localhost:4000` is unavailable, check for port 4000 usage:
   - Windows: `netstat -an | findstr 4000`
   - Ubuntu/macOS: `ss -tuln | grep 4000`

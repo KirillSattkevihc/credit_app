@@ -2,34 +2,53 @@ defmodule CreditAppWeb.SalaryController do
   use CreditAppWeb, :controller
   import Phoenix.Component
 
-  alias CreditApp.Accounts
-  alias CreditApp.Email
+  alias CreditApp.Operations.CreditCalculator
+  alias CreditApp.Operations.Email
+  alias CreditApp.Operations.SalaryRecords
+  alias CreditApp.Operations.User, as: UserOperations
+
+  alias CreditApp.Models.User
 
   def show(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
+    case UserOperations.get_user(id) do
+      nil ->
+        conn
+        |> put_flash(:error, "User not found")
+        |> redirect(to: ~p"/")
 
-    salary_form = to_form(%{}, as: "salary")
-
-    render(conn, :show,
-      user: user,
-      salary: salary_form
-    )
+      %User{} = user ->
+        salary_form = to_form(%{}, as: "salary")
+        render(conn, :show, user: user, salary: salary_form)
+    end
   end
 
   def update(conn, %{"id" => id, "salary" => %{"income" => income, "expenses" => expenses}}) do
-    user = Accounts.get_user!(id)
+    with %User{} = user <- UserOperations.get_user(id),
+         {:ok, credit_limit} <- CreditCalculator.call(income, expenses),
+         {:ok, salary_record} <-
+           SalaryRecords.create(%{
+             user_id: user.id,
+             income: Decimal.new(income),
+             expenses: Decimal.new(expenses),
+             credit_limit: credit_limit
+           }),
+         :ok <- Email.send(user, salary_record) do
+      message =
+        "Congratulations, you have been approved for credit up to $#{Decimal.to_string(credit_limit)}"
 
-    income_dec = Decimal.new(income)
-    expenses_dec = Decimal.new(expenses)
-    diff = Decimal.sub(income_dec, expenses_dec)
-    credit_limit = Decimal.mult(diff, Decimal.new(12))
+      conn
+      |> put_flash(:info, message)
+      |> redirect(to: ~p"/")
+    else
+      nil ->
+        conn
+        |> put_flash(:error, "User not found")
+        |> redirect(to: ~p"/")
 
-    Email.send_pdf(user, credit_limit)
-
-    message = "Congratulations, you have been approved for credit up to $#{credit_limit}"
-
-    conn
-    |> put_flash(:info, message)
-    |> redirect(to: ~p"/")
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, "Operation failed: #{inspect(reason)}")
+        |> redirect(to: ~p"/")
+    end
   end
 end
